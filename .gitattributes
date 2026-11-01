@@ -1,0 +1,8 @@
+# Preserve byte-for-byte research records and their browsable copies.
+/reproducibility/** -text
+/src/** -text
+/tests/** -text
+/data/inputs/** -text
+/results/primary/** -text
+/requirements.txt -text
+/data/*.csv -text

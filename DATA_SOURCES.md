@@ -1,0 +1,18 @@
+# Data sources and attribution
+
+The input files below are snapshots used for the reported experiments. Included browsable copies are in `data/inputs/`; the original execution hashes are recorded in `reproducibility/manifest_sha256.json`. The two yeast network snapshots are excluded from Git pending confirmation of redistribution terms. The original articles and data providers should be cited when these inputs are reused; including files here does not transfer their rights to this project.
+
+| Archived input | Source and role | Public source / citation |
+| --- | --- | --- |
+| `data/inputs/YDIP/interactions.txt` and `YBIOGRID/interactions.txt` | Yeast network snapshots used with a common 3,408-candidate background for the study; **excluded from this Git repository**. | [The-construction-of-the-CM-PIN.](https://github.com/paopaopig/The-construction-of-the-CM-PIN./tree/main/datasets/yeast) repository. Run `python tools/restore_yeast_inputs.py` to retrieve and verify them from that source. Redistribution terms have not been established. |
+| `data/inputs/YeRI_supplementary_data_15.xlsx` | YeRI role-screening flags used to define the common yeast candidate background. Positive interactions from this file were not used for evaluation. | Lambourne et al., *Nature Communications* 17, 4894 (2026), [doi:10.1038/s41467-026-70942-x](https://doi.org/10.1038/s41467-026-70942-x), Supplementary Data 15. The article is under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/); the source and license are credited here. |
+| `data/inputs/HuRI.tsv` | Later human interaction records used for retrospective evaluation after exclusion of earlier records. | [Human Reference Interactome download portal](https://interactome-atlas.org/download); Luck et al., *Nature* 580, 402–408 (2020), [doi:10.1038/s41586-020-2188-x](https://doi.org/10.1038/s41586-020-2188-x). The portal states CC BY 4.0 and asks users to cite the portal and publication. |
+| `data/inputs/balanced_assay_source_audit/raw/HI-II-14.tsv`, `H-I-05.tsv`, and `Test_space_screens-19.tsv` | HI-II-14 provides human training edges; the other two help exclude earlier records from retrospective evaluation. | [Human Reference Interactome download portal](https://interactome-atlas.org/download), which lists the corresponding datasets and publications and states CC BY 4.0 for portal data. |
+| `data/inputs/balanced_assay_space1_20261024/historical_mapping_candidates.json` | Derived mapping of historical Space-I ORFs to the fixed human candidate background. | Historical Space-I source: Rual et al., *Nature* 437, 1173–1178 (2005), [doi:10.1038/nature04209](https://doi.org/10.1038/nature04209). Derived candidate definitions and mapping caveats are described in the manuscript and supplement. |
+
+For the human comparison, candidate definition was independent of later positive-edge endpoints. The final restricted graph has 6,277 candidates, 3,548 training edges, and 7,365 later-recorded evaluation edges. Cross-period sequence equivalence and experimental role availability are not established by identifier matching alone.
+
+For yeast, the processed candidate-restricted graphs contain 8,294 YDIP and 25,167 YBIOGRID edges before splitting. Each of 20 fixed seeds produces an 80:20 train/evaluation edge split. Training isolates remain in the candidate background.
+
+The project-generated panels, calibrations, and scores are in `reproducibility/tmp/ppi_data_audit/balanced_assay_initialization_time_20261024/`. The main score and panel indexes are also copied to `results/primary/`. The CSV exports in `data/` contain the same recorded results in table form. The upstream snapshots and derived outputs have different provenance and are not assigned one blanket license.
+

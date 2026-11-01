@@ -1,0 +1,47 @@
+{
+  "config": {
+    "seeds": [
+      20261020,
+      20261021,
+      20261022,
+      20261023,
+      20261024,
+      20261025,
+      20261026,
+      20261027,
+      20261028,
+      20261029,
+      20261030,
+      20261031,
+      20261032,
+      20261033,
+      20261034,
+      20261035,
+      20261036,
+      20261037,
+      20261038,
+      20261039
+    ],
+    "budget": 200,
+    "guard": 0.98,
+    "iterations": 100,
+    "lambda_initial": 1e-10,
+    "lambda_multiplier": 10,
+    "beta_fraction": 0.9,
+    "conflict_multiplier": 0.1,
+    "spectral_iterations": 30,
+    "jitter": 0.001,
+    "repair_shortlist": 8,
+    "initializations": [
+      "uniform",
+      "jitter"
+    ],
+    "timing_tolerance": 0.05
+  },
+  "files": {
+    "balanced_assay_ep_adapter.py": "0159f46a05427014b5f245c1e5f6d328a4a580912877f4b4ad1f5a4ac06e838c",
+    "ppi_data_audit\\balanced_assay_ep_adapter_protocol.md": "68373f13928afaa7baf42279317fc90ca8df897c7d5094f288903b8c7e8a16a2",
+    "ppi_data_audit\\balanced_assay_timecheck\\lock.json": "f43975523f9b82cc5081b0bbec6c9c777f1a8a14b07ec589b9bf73f78852ca2f"
+  },
+  "interpretation": "EP-Prox-inspired independent adapter; not an original-author replication or new external confirmation"
+}

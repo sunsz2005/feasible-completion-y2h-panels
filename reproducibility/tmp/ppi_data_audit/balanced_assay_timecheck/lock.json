@@ -1,0 +1,44 @@
+{
+  "config": {
+    "budget": 200,
+    "guard": 0.98,
+    "seeds": [
+      20261020,
+      20261021,
+      20261022,
+      20261023,
+      20261024,
+      20261025,
+      20261026,
+      20261027,
+      20261028,
+      20261029,
+      20261030,
+      20261031,
+      20261032,
+      20261033,
+      20261034,
+      20261035,
+      20261036,
+      20261037,
+      20261038,
+      20261039
+    ],
+    "replacement_shortlist": 128,
+    "perturb_steps": [
+      2,
+      4,
+      8
+    ],
+    "timing_tolerance_fraction": 0.05,
+    "timing_tolerance_seconds": 0.02
+  },
+  "files": {
+    "balanced_assay_timecheck.py": "0cc5bbca46d34fec42cd22f91f78b4a74227283e22a41186c9074c1f658e64f3",
+    "ppi_data_audit\\balanced_assay_timecheck_protocol.md": "50ef2ef9d1aa420c2c85aeb750c38b8b66f4a4f2753c55438fa9d12a5e87b4b9",
+    "ppi_data_audit\\balanced_assay_tradeoff\\lock.json": "b5142759b8b24158e0aec22cec0ec2b7568d213cf84f4e1d0df4e90de3f9edcf",
+    "balanced_assay_tradeoff.py": "7687e5e856fc50a1b6b413c23498855591b76bd0a42a0836884100e5dd73f79a",
+    "balanced_assay_pilot.py": "2adcb604dc68395c2d640399ab5448c0c0c8492334d2a4d961cd3ee0e0ab20e9"
+  },
+  "interpretation": "third development round; same previously used edge splits"
+}

@@ -1,0 +1,32 @@
+主比较公平性与可复现性技术核查（2026-10-25）
+
+结论：代码、封存输出及重新计算的成绩支持当前主比较。未发现需要重跑主实验或改变主要结论的问题。修订集中在精确计时边界和异机复核入口。实验代码、参数、面板及原 scores.json 未改动。
+
+核查项目 | 代码事实 | 复核结果
+相同求解器 | pipeline 对 A/B 均调用 multistart(initial,floor,remaining,seed,True)，使用同一 timed_descent，128替换动作短名单 | 通过源码及受控时钟测试
+初始化成本 | 计时在 initialize 前开始，A支付参考选点和partition，B额外支付feasible_role_greedy及角色优化，剩余时间才交搜索 | 360条记录逐项确认 search_allowance 不超过扣除初始化后的余量
+覆盖阈值 | 标定计算0.98C(S_cov)，作为两流程共享标量；各流程面板重新生成 | 已在中英文正文与补充材料明确，未将标定面板作为免费起点
+计时边界 | 入口至求解器返回；内部可行性检查计时，标定/图建立/末尾覆盖复算/文件写入不计 | 已明确为优化路径预算，非完整处理时间
+截止余量 | 共同求解器预留0.01秒；容差为max(0.02秒,0.05T) | 两流程相同规则，保留全部计时例外
+重启与状态 | 首次本流程起点；后续奇数best、偶数base；2/4/8扰动；同种子独立生成器；严格训练改善才更新 | 规则相同；作用包含初始化及持续重启锚点，不解释为纯一次性起点影响
+成对统计 | 同来源/种子/预算 A与B配对；分别取(B−A)及(B−A)/A中位数 | 180配对、9组汇总完全一致；本批无零分母
+评价与训练 | 训练选择输出，封存后统一评分；酵母20原分割，人类同一图对20搜索重复 | 未混作独立生物重复，无显著性外推
+输入版本 | 沿原锁链核对原始输入、映射候选、代码和协议哈希；复核41训练数组及40评价分割哈希 | 所有哈希通过，候选及边数与正文一致
+输出与分数 | 360容量/互斥/覆盖/训练分数复算，另以Python集合成员判断独立统计评价边 | 360/360一致；完整重放结果与scores.json逐字段一致
+时间例外 | 主要5倍120/120有效，扩展20倍120/120有效；总358/360有效 | 两例YDIP、B、1倍预算的初始化回退保留，无删除/重跑
+环境与便携性 | Python3.12.14、NumPy2.3.5、openpyxl3.1.5；原锁含Windows绝对路径 | 新增相对目录解析的只读复核器，保留原锁与实验脚本原样
+
+修订与交付
+1. 中英文正文明确共享覆盖阈值及优化路径计时起止。
+2. 中英文补充材料明确0.01秒余量、重启索引、同分处理、内部/末尾核验的计时区别。
+3. primary_comparison_audit_2026-10-25.json 提供机器可读检查及原始文件哈希。
+4. primary_comparison_reproducibility_2026-10-25.zip 保存冻结依赖、输入、面板、成绩与只读评分复核器。
+5. 精确复核封存评分不需要重跑限时搜索。异机重新搜索可能因墙钟、处理器和负载得到不同轨迹；本次检查不将评分重放等同于跨硬件计时复现。
+
+具体定位
+控制器：tmp/balanced_assay_initialization_time.py 的 initialize、pipeline、calibration、generate、score。
+搜索器：tmp/balanced_assay_timecheck.py 的 multistart、timed_descent。
+输入与初始角色：tmp/balanced_assay_pilot.py 的 inputs、coverage_order、partition。
+构造：tmp/balanced_assay_tradeoff.py 的 feasible_role_greedy。
+人类背景与排除：tmp/balanced_assay_external.py 的 cohort、restricted、novel。
+复核：tmp/audit_primary_comparison.py；计时边界测试：tmp/test_balanced_assay_initialization_time.py。

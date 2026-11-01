@@ -1,0 +1,58 @@
+{
+  "config": {
+    "seeds": [
+      20261020,
+      20261021,
+      20261022,
+      20261023,
+      20261024,
+      20261025,
+      20261026,
+      20261027,
+      20261028,
+      20261029,
+      20261030,
+      20261031,
+      20261032,
+      20261033,
+      20261034,
+      20261035,
+      20261036,
+      20261037,
+      20261038,
+      20261039
+    ],
+    "budgets": [
+      50,
+      100,
+      200
+    ],
+    "guards": [
+      0.98,
+      0.95,
+      1.0
+    ],
+    "q": 0.8,
+    "train_fraction": 0.8,
+    "single_rounds": 80,
+    "replacement_shortlist": 128,
+    "escape_rounds": 3,
+    "proposals_per_length": 64,
+    "lengths": [
+      2,
+      3,
+      4
+    ]
+  },
+  "files": {
+    "balanced_assay_pilot.py": "2adcb604dc68395c2d640399ab5448c0c0c8492334d2a4d961cd3ee0e0ab20e9",
+    "ppi_data_audit\\balanced_assay_design.md": "a15cc84845083d20431eee15b32ea374f9d81378000a23df2947cfe6554971c3",
+    "ppi_data_audit\\balanced_assay_implementation_lock.md": "76d4ec4e5ff1fd7e9184aefa001ecffb6d10924defc9c9132b25e3793fe1e89f",
+    "ppi_data_audit\\YeRI_supplementary_data_15.xlsx": "785e05c53b1efb7f8912a103f5d6d58ab759fae8db14e933e2b28784cc0799e0",
+    "ppi_data_audit\\YDIP\\interactions.txt": "ded6cc2c13a63c08c91bead1e1d213dd689b3faf3f3bf81832c8624812700219",
+    "ppi_data_audit\\YBIOGRID\\interactions.txt": "64897f90c458dd2b7ceadf922d3313c688fef91fc1a8ae588c8b8a3338be4370"
+  },
+  "python": "3.12.14",
+  "numpy": "2.3.5",
+  "openpyxl": "3.1.5"
+}

@@ -1,0 +1,41 @@
+{
+  "config": {
+    "seeds": [
+      20261020,
+      20261021,
+      20261022,
+      20261023,
+      20261024,
+      20261025,
+      20261026,
+      20261027,
+      20261028,
+      20261029,
+      20261030,
+      20261031,
+      20261032,
+      20261033,
+      20261034,
+      20261035,
+      20261036,
+      20261037,
+      20261038,
+      20261039
+    ],
+    "budget": 200,
+    "guard": 0.98,
+    "policies": [
+      "role",
+      "degree"
+    ],
+    "repair": "reference-directed 8x8 coverage repair",
+    "timing_tolerance_fraction": 0.05,
+    "timing_tolerance_seconds": 0.02
+  },
+  "files": {
+    "balanced_assay_gate_control.py": "d8ee7fb44a4d914dfadba98a486b891757314f7618e8118fa4f7ba516f512d74",
+    "ppi_data_audit\\balanced_assay_gate_control_protocol.md": "c2f7c1fbe91d84fec8ddf23bdd7a512615373712717d8c9c86a6940db9261421",
+    "ppi_data_audit\\balanced_assay_ep_adapter\\lock.json": "f691354a4cd78d3e8c638a3af0bddb11affb8be6d8f3358d472ce85f15a29ebc"
+  },
+  "interpretation": "Same previously inspected splits; controlled development pipeline comparison"
+}

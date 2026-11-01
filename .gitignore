@@ -1,0 +1,10 @@
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.DS_Store
+*.pending
+/data/inputs/YDIP/interactions.txt
+/data/inputs/YBIOGRID/interactions.txt
+/reproducibility/tmp/ppi_data_audit/YDIP/interactions.txt
+/reproducibility/tmp/ppi_data_audit/YBIOGRID/interactions.txt
