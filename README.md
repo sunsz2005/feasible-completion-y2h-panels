@@ -1,18 +1,19 @@
 # Feasible completion sets for dual-role screening panels
 
-Code, input snapshots, sealed panels, and results for **“Feasible completion sets for coverage-constrained yeast two-hybrid panel design”** by Feng Sun and Haiye Liang. This directory is prepared for a public research repository accompanying a submission to *BMC Bioinformatics*.
+Code, input snapshots, sealed panels, and results for **“Feasible completion sets for coverage-constrained yeast two-hybrid panel design”** by Feng Sun and Haiye Liang. This directory accompanies a submission to *Algorithms for Molecular Biology*.
 
 ## Contents
 
 | Path | Contents |
 | --- | --- |
-| `src/` | Seven original research scripts, directly visible at the top level. |
+| `src/` | Seven original research scripts plus the later independent SA benchmark script. |
 | `tests/` | Original score-replay audit and timing-boundary tests. |
 | `data/inputs/` | Six included input and derived-mapping files. Two yeast network snapshots are obtained separately. |
 | `data/primary_summary.csv` | Nine source-by-budget summary rows. |
 | `data/primary_paired.csv` | 180 paired evaluation comparisons. |
 | `data/primary_runs.csv` | All 360 individual optimization paths. |
 | `results/primary/` | Original score and sealed-panel indexes. |
+| `results/independent_sa/` | Follow-up simulated-annealing protocol, sealed panels, scores, and paired summaries. |
 | `reproducibility/` | Original archive layout, including protocols, calibrations, all panel files, locks, and audit output; two yeast network snapshots are excluded from Git. |
 | `reproducibility/manifest_sha256.json` | SHA-256 digests for all 479 original research files, including the two excluded inputs. |
 | `tools/verify_release.py` | Standard-library check of the included archive, browsable copies, and CSV exports. |
@@ -20,6 +21,8 @@ Code, input snapshots, sealed panels, and results for **“Feasible completion s
 | `DATA_SOURCES.md` | Sources, attribution, and data-use notes. |
 
 The files in `src/`, `tests/`, `data/inputs/`, and `results/primary/` are browsable copies of the original execution snapshot. The historical layout lives in `reproducibility/`; restore the two excluded yeast inputs before running the full score audit. Included archived files are unchanged from the audit archive. Original lock files contain historical Windows paths that the audit script resolves relative to this checkout. The verifier checks the included files against the manifest and their browsable copies. The CSV files are convenient exports of the original `scores.json`; the JSON is authoritative.
+
+The later independent-SA benchmark is in `src/independent_sa_benchmark.py` and `results/independent_sa/`. It adds a separate experiment without changing the seven original scripts or the archived primary results. Its A and B paths are rerun beside the independent SA path in one software environment; they should not be substituted for the original primary summaries. The benchmark's protocol, code and input hashes, panel files, seal, scores, and paired summaries permit a separate audit.
 
 The authors' original software code is offered under the [MIT License](LICENSE). Third-party input datasets are excluded from that license and retain their source terms; see [DATA_SOURCES.md](DATA_SOURCES.md).
 
@@ -54,6 +57,23 @@ python reproducibility/tmp/audit_primary_comparison.py
 ```
 
 After the yeast inputs are restored, the audit checks input and implementation hashes, all 360 panel constraints and evaluation scores, 180 paired statistics, nine summary groups, and six clock-controlled boundary tests. It writes `reproducibility/output/research/primary_comparison_audit_2026-10-25.json`. Run it in a disposable copy if you need the original archive tree to remain byte-for-byte unchanged. The audit replays **sealed outputs**; it does not regenerate timed search trajectories.
+
+## Independent simulated-annealing comparison
+
+The follow-up comparison uses the same 20 yeast splits and 20 human search seeds at the archived primary `5*T0` budget. It compares complete A and B pipelines with a separate constrained simulated-annealing joint optimizer, rerunning all three serially on the same computer and software environment. Initialization time is included for each path. Evaluation interactions are parsed and scored only after all 180 panel outputs are sealed. See `results/independent_sa/protocol.md` for the fixed move, cooling, coverage, and timing rules. The two yeast input snapshots must be restored locally before regeneration; they remain excluded from Git.
+
+With Python 3.11.7 and the versions in `requirements_independent_sa.txt` installed, the steps are:
+
+```bash
+python src/independent_sa_benchmark.py lock
+python src/independent_sa_benchmark.py generate
+python src/independent_sa_benchmark.py score
+python tools/summarize_independent_sa.py
+```
+
+The lock command is for a fresh checkout only; it refuses to overwrite an existing lock. Generation likewise refuses to overwrite a completed seal. To replay scores without rerunning the timed paths, use the existing lock and seal and run only `score` and `summarize_independent_sa.py` after restoring the yeast inputs.
+
+The lock records a SHA-256 digest of the evaluation file before generation to identify the input version. The generation algorithm does not parse evaluation-edge records or use their scores; parsing and scoring occur after the panel seal.
 
 ## Reproduction scope
 
