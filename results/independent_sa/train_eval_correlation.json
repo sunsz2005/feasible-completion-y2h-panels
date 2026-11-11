@@ -1,0 +1,29 @@
+{
+  "YDIP": {
+    "n": 20,
+    "spearman_rho": 0.34846787487904396,
+    "b_eval_wins": 13,
+    "eval_ties": 0,
+    "sa_eval_wins": 7,
+    "training_evaluation_sign_discordances": 11,
+    "training_ties": 2
+  },
+  "YBIOGRID": {
+    "n": 20,
+    "spearman_rho": -0.24463682575697704,
+    "b_eval_wins": 2,
+    "eval_ties": 0,
+    "sa_eval_wins": 18,
+    "training_evaluation_sign_discordances": 2,
+    "training_ties": 0
+  },
+  "SpaceI": {
+    "n": 20,
+    "spearman_rho": 0.5703502862155034,
+    "b_eval_wins": 20,
+    "eval_ties": 0,
+    "sa_eval_wins": 0,
+    "training_evaluation_sign_discordances": 0,
+    "training_ties": 0
+  }
+}

@@ -75,6 +75,12 @@ The lock command is for a fresh checkout only; it refuses to overwrite an existi
 
 The lock records a SHA-256 digest of the evaluation file before generation to identify the input version. The generation algorithm does not parse evaluation-edge records or use their scores; parsing and scoring occur after the panel seal.
 
+For the descriptive training-versus-evaluation comparison, install `requirements_train_eval_plot.txt` and run `python tools/plot_train_eval_deltas.py`. It reads the sealed `paired.csv` and writes `train_eval_correlation.json` and `train_eval_deltas.pdf` in the same results directory. The 20 human points reuse one graph pair, so the reported Spearman coefficients describe search-run variation rather than independent biological samples.
+
+The separate coverage-threshold follow-up is in `src/coverage_sensitivity_benchmark.py` and `results/coverage_sensitivity/`. It fixes `q=0.8`, `k=200`, and the same `5*T0` total budget while testing `tau=0.90, 0.95, 0.98`. The 0.98 A/B paths come from the sealed independent-SA rerun. After restoring the excluded yeast snapshots and installing `requirements_independent_sa.txt`, its commands are `lock`, `generate`, and `score`, followed by `python tools/summarize_coverage_sensitivity.py`. The protocol explains the fixed-panel feasible-replacement probe and why its results are descriptive.
+
+For a more informative post hoc check of the final panels' local neighborhoods, run `python tools/probe_output_neighborhood.py` after scoring. It writes `output_neighborhood.json`; `results/coverage_sensitivity/output_neighborhood_protocol.md` defines the sampled move and its limitations.
+
 ## Reproduction scope
 
 The original comparison used 20 yeast split/search seeds for each of YDIP and YBIOGRID, and 20 search seeds on one historical human graph pair. Budgets were calibrated per training instance at `T0`, `5T0`, and `20T0`. Evaluation edges were counted only after outputs had been selected by training scores and sealed. The run environment was an Intel Core i7-6700 CPU at 3.40 GHz with eight logical processors, Windows 10 Home China 22H2, Python 3.12.14, NumPy 2.3.5, and openpyxl 3.1.5. Optimization paths ran sequentially. No OpenMP, OpenBLAS, or MKL thread limit was set; NumPy's effective native thread count was not logged. Wall-clock trajectories can vary on other machines.

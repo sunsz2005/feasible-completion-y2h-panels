@@ -1,0 +1,64 @@
+{
+  "config": {
+    "sources": [
+      "YDIP",
+      "YBIOGRID",
+      "SpaceI"
+    ],
+    "seeds": [
+      20261020,
+      20261021,
+      20261022,
+      20261023,
+      20261024,
+      20261025,
+      20261026,
+      20261027,
+      20261028,
+      20261029,
+      20261030,
+      20261031,
+      20261032,
+      20261033,
+      20261034,
+      20261035,
+      20261036,
+      20261037,
+      20261038,
+      20261039
+    ],
+    "guards_new": [
+      0.9,
+      0.95
+    ],
+    "guards_reused": [
+      0.98
+    ],
+    "methods": [
+      "A",
+      "B"
+    ],
+    "q": 0.8,
+    "k": 200,
+    "multiplier": 5,
+    "probe_pairs": 1000
+  },
+  "environment": {
+    "python": "3.11.7",
+    "numpy": "1.26.4",
+    "openpyxl": "3.0.10",
+    "platform": "Windows-10-10.0.19045-SP0",
+    "processor": "Intel64 Family 6 Model 94 Stepping 3, GenuineIntel",
+    "threads": {
+      "OMP_NUM_THREADS": "1",
+      "OPENBLAS_NUM_THREADS": "1",
+      "MKL_NUM_THREADS": "1"
+    }
+  },
+  "files_sha256": {
+    "src\\coverage_sensitivity_benchmark.py": "cf773dfc08228a5de660c19403e1b0b5f547099448c038ca3fcfbdc96529ae70",
+    "results\\coverage_sensitivity\\protocol.md": "2e3f5ed7b531f89414177dba6df4aeaa917024372ae427e47c265438c844b8b5",
+    "src\\independent_sa_benchmark.py": "c3b641e58b003e16fd27fd6862cb7a03678272b4ff717d1130e35efbc1ba50bd"
+  },
+  "prior_seal_sha256": "9e55606982387370b195da91ff88a8dce0a656325c4774ce6a2982928e185540"
+}
