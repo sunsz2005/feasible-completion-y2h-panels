@@ -6,7 +6,7 @@ Code, input snapshots, sealed panels, and results for **“Feasible completion-s
 
 | Path | Contents |
 | --- | --- |
-| `src/` | Seven original research scripts plus the later independent SA benchmark script. |
+| `src/` | Seven original research scripts plus the later independent SA and coverage-sensitivity benchmark scripts. |
 | `tests/` | Original score-replay audit and timing-boundary tests. |
 | `data/inputs/` | Six included input and derived-mapping files. Two yeast network snapshots are obtained separately. |
 | `data/primary_summary.csv` | Nine source-by-budget summary rows. |
@@ -14,6 +14,7 @@ Code, input snapshots, sealed panels, and results for **“Feasible completion-s
 | `data/primary_runs.csv` | All 360 individual optimization paths. |
 | `results/primary/` | Original score and sealed-panel indexes. |
 | `results/independent_sa/` | Follow-up simulated-annealing protocol, sealed panels, scores, and paired summaries. |
+| `results/coverage_sensitivity/` | Coverage-threshold protocol, sealed panels, scores, probes, and paired summaries. |
 | `reproducibility/` | Original archive layout, including protocols, calibrations, all panel files, locks, and audit output; two yeast network snapshots are excluded from Git. |
 | `reproducibility/manifest_sha256.json` | SHA-256 digests for all 479 original research files, including the two excluded inputs. |
 | `tools/verify_release.py` | Standard-library check of the included archive, browsable copies, and CSV exports. |
@@ -62,22 +63,24 @@ After the yeast inputs are restored, the audit checks input and implementation h
 
 The follow-up comparison uses the same 20 yeast splits and 20 human search seeds at the archived primary `5*T0` budget. It compares complete A and B pipelines with a separate constrained simulated-annealing joint optimizer, rerunning all three serially on the same computer and software environment. Initialization time is included for each path. Evaluation interactions are parsed and scored only after all 180 panel outputs are sealed. See `results/independent_sa/protocol.md` for the fixed move, cooling, coverage, and timing rules. The two yeast input snapshots must be restored locally before regeneration; they remain excluded from Git.
 
-With Python 3.11.7 and the versions in `requirements_independent_sa.txt` installed, the steps are:
+With Python 3.11.7 and the versions in `requirements_independent_sa.txt` installed, replay the published sealed panels after restoring the yeast inputs:
 
 ```bash
-python src/independent_sa_benchmark.py lock
-python src/independent_sa_benchmark.py generate
 python src/independent_sa_benchmark.py score
 python tools/summarize_independent_sa.py
+python src/coverage_sensitivity_benchmark.py score
+python tools/summarize_coverage_sensitivity.py
 ```
 
-The lock command is for a fresh checkout only; it refuses to overwrite an existing lock. Generation likewise refuses to overwrite a completed seal. To replay scores without rerunning the timed paths, use the existing lock and seal and run only `score` and `summarize_independent_sa.py` after restoring the yeast inputs.
+The published checkout already contains both locks, seals, and all panel files. The `lock` command refuses an existing lock, and `generate` refuses an existing seal. For an independent timed rerun, use a disposable copy: remove the generated `lock.json`, `seal.json`, and `panel_*.json` files from both follow-up result directories while retaining their protocols; then run SA `lock`, `generate`, and `score`, followed by sensitivity `lock`, `generate`, and `score`. Recreate summaries after scoring. Wall-clock trajectories may differ, so a timed rerun is not expected to reproduce the archived panel bytes.
 
 The lock records a SHA-256 digest of the evaluation file before generation to identify the input version. The generation algorithm does not parse evaluation-edge records or use their scores; parsing and scoring occur after the panel seal.
 
 For the descriptive training-versus-evaluation comparison, install `requirements_train_eval_plot.txt` and run `python tools/plot_train_eval_deltas.py`. It reads the sealed `paired.csv` and writes `train_eval_correlation.json` and `train_eval_deltas.pdf` in the same results directory. The 20 human points reuse one graph pair, so the reported Spearman coefficients describe search-run variation rather than independent biological samples.
 
-The separate coverage-threshold follow-up is in `src/coverage_sensitivity_benchmark.py` and `results/coverage_sensitivity/`. It fixes `q=0.8`, `k=200`, and the same `5*T0` total budget while testing `tau=0.90, 0.95, 0.98`. The 0.98 A/B paths come from the sealed independent-SA rerun. After restoring the excluded yeast snapshots and installing `requirements_independent_sa.txt`, its commands are `lock`, `generate`, and `score`, followed by `python tools/summarize_coverage_sensitivity.py`. The protocol explains the fixed-panel feasible-replacement probe and why its results are descriptive.
+The separate coverage-threshold follow-up is in `src/coverage_sensitivity_benchmark.py` and `results/coverage_sensitivity/`. It fixes `q=0.8`, `k=200`, and the same `5*T0` total budget while testing `tau=0.90, 0.95, 0.98`. The 0.98 A/B paths come from the sealed independent-SA rerun. The commands above replay its archived scores and summary. The protocol explains the fixed-panel feasible-replacement probe and why its results are descriptive.
+
+Here `q=0.8` is the coverage-model parameter in the manuscript's coverage equation. The yeast training/evaluation edge split is separately 80:20. The locked sensitivity protocol uses the phrase "training fraction" for `q`; that phrase is a terminology error, and the protocol is preserved unchanged to retain its recorded SHA-256 lock.
 
 For a more informative post hoc check of the final panels' local neighborhoods, run `python tools/probe_output_neighborhood.py` after scoring. It writes `output_neighborhood.json`; `results/coverage_sensitivity/output_neighborhood_protocol.md` defines the sampled move and its limitations.
 
