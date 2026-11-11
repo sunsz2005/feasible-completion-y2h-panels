@@ -1,6 +1,6 @@
 cff-version: 1.2.0
 message: "If you use this code or data package, please cite the associated article and the original data sources listed in DATA_SOURCES.md."
-title: "Feasible completion sets for coverage-constrained yeast two-hybrid panel design: code and data"
+title: "Feasible completion-set construction for coverage-constrained yeast two-hybrid panel optimization: code and data"
 type: software
 repository-code: "https://github.com/sunsz2005/feasible-completion-y2h-panels"
 authors:

@@ -1,6 +1,6 @@
 # Feasible completion sets for dual-role screening panels
 
-Code, input snapshots, sealed panels, and results for **“Feasible completion sets for coverage-constrained yeast two-hybrid panel design”** by Feng Sun and Haiye Liang. This directory accompanies a submission to *Algorithms for Molecular Biology*.
+Code, input snapshots, sealed panels, and results for **“Feasible completion-set construction for coverage-constrained yeast two-hybrid panel optimization”** by Feng Sun and Haiye Liang. This directory accompanies a submission to *Algorithms for Molecular Biology*.
 
 ## Contents
 
