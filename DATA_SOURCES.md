@@ -14,5 +14,5 @@ For the human comparison, candidate definition was independent of later positive
 
 For yeast, the processed candidate-restricted graphs contain 8,294 YDIP and 25,167 YBIOGRID edges before splitting. Each of 20 fixed seeds produces an 80:20 train/evaluation edge split. Training isolates remain in the candidate background.
 
-The project-generated panels, calibrations, and scores are in `reproducibility/tmp/ppi_data_audit/balanced_assay_initialization_time_20261024/`. The main score and panel indexes are also copied to `results/primary/`. The CSV exports in `data/` contain the same recorded results in table form. The upstream snapshots and derived outputs have different provenance and are not assigned one blanket license.
+The project-generated panels, calibrations, and scores are in `reproducibility/primary_archive/ppi_data_audit/balanced_assay_initialization_time_20261024/`. The main score and panel indexes are also copied to `results/primary/`. The CSV exports in `data/` contain the same recorded results in table form. The upstream snapshots and derived outputs have different provenance and are not assigned one blanket license.
 

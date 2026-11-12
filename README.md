@@ -1,6 +1,6 @@
 # Feasible completion sets for dual-role screening panels
 
-Code, input snapshots, sealed panels, and results for **“Feasible completion-set construction for coverage-constrained yeast two-hybrid panel optimization”** by Feng Sun and Haiye Liang. This directory accompanies a submission to *Algorithms for Molecular Biology*.
+Code, input snapshots, sealed panels, and results for **Feasible completion-set construction for coverage-constrained yeast two-hybrid panel optimization** by Feng Sun and Haiye Liang. This directory accompanies a submission to *Algorithms for Molecular Biology*.
 
 ## Contents
 
@@ -15,13 +15,13 @@ Code, input snapshots, sealed panels, and results for **“Feasible completion-s
 | `results/primary/` | Original score and sealed-panel indexes. |
 | `results/independent_sa/` | Follow-up simulated-annealing protocol, sealed panels, scores, and paired summaries. |
 | `results/coverage_sensitivity/` | Coverage-threshold protocol, sealed panels, scores, probes, and paired summaries. |
-| `reproducibility/` | Original archive layout, including protocols, calibrations, all panel files, locks, and audit output; two yeast network snapshots are excluded from Git. |
-| `reproducibility/manifest_sha256.json` | SHA-256 digests for all 479 original research files, including the two excluded inputs. |
+| `reproducibility/primary_archive/` | Original scripts, protocols, calibrations, panels, locks, and results, displayed under a descriptive directory name; two yeast network snapshots are excluded from Git. |
+| `reproducibility/manifest_sha256.json` | Unchanged historical SHA-256 manifest for all 479 original research files, including the two excluded inputs. |
 | `tools/verify_release.py` | Standard-library check of the included archive, browsable copies, and CSV exports. |
 | `tools/restore_yeast_inputs.py` | Fetch and hash-check the two excluded yeast network snapshots from their upstream repository. |
 | `DATA_SOURCES.md` | Sources, attribution, and data-use notes. |
 
-The files in `src/`, `tests/`, `data/inputs/`, and `results/primary/` are browsable copies of the original execution snapshot. The historical layout lives in `reproducibility/`; restore the two excluded yeast inputs before running the full score audit. Included archived files are unchanged from the audit archive. Original lock files contain historical Windows paths that the audit script resolves relative to this checkout. The verifier checks the included files against the manifest and their browsable copies. The CSV files are convenient exports of the original `scores.json`; the JSON is authoritative.
+The files in `src/`, `tests/`, `data/inputs/`, and `results/primary/` are browsable copies of the original execution snapshot. The historical layout lives in `reproducibility/`; restore the two excluded yeast inputs before running the full score audit. The original experiment files are displayed under `reproducibility/primary_archive/`; their bytes and historical manifest hashes are preserved. The original locks and follow-up scripts refer to the former `tmp/` path, so `tools/prepare_legacy_layout.py` creates an ignored local compatibility copy when score replay is requested. Included archived files are unchanged from the audit archive. Original lock files contain historical Windows paths that the audit script resolves relative to this checkout. The verifier checks the included files against the manifest and their browsable copies. The CSV files are convenient exports of the original `scores.json`; the JSON is authoritative.
 
 The later independent-SA benchmark is in `src/independent_sa_benchmark.py` and `results/independent_sa/`. It adds a separate experiment without changing the seven original scripts or the archived primary results. Its A and B paths are rerun beside the independent SA path in one software environment; they should not be substituted for the original primary summaries. The benchmark's protocol, code and input hashes, panel files, seal, scores, and paired summaries permit a separate audit.
 
@@ -46,7 +46,7 @@ python tools/restore_yeast_inputs.py
 python tools/verify_release.py
 ```
 
-The restoration script downloads each file from that upstream repository, checks its SHA-256 against the historical manifest, and places verified copies in both `data/inputs/` and `reproducibility/tmp/ppi_data_audit/`. It accepts the upstream file's original or normalized line endings only when the historical hash matches. If the upstream files change, the script stops without substituting different data. The original YDIP and YBIOGRID SHA-256 values are `ded6cc2c13a63c08c91bead1e1d213dd689b3faf3f3bf81832c8624812700219` and `64897f90c458dd2b7ceadf922d3313c688fef91fc1a8ae588c8b8a3338be4370`, respectively.
+The restoration script downloads each file from that upstream repository, checks its SHA-256 against the historical manifest, and places verified copies in both `data/inputs/` and `reproducibility/primary_archive/ppi_data_audit/`. It accepts the upstream file's original or normalized line endings only when the historical hash matches. If the upstream files change, the script stops without substituting different data. The original YDIP and YBIOGRID SHA-256 values are `ded6cc2c13a63c08c91bead1e1d213dd689b3faf3f3bf81832c8624812700219` and `64897f90c458dd2b7ceadf922d3313c688fef91fc1a8ae588c8b8a3338be4370`, respectively.
 
 ## Replay sealed-panel scoring
 
@@ -54,7 +54,7 @@ Use **Python 3.12.14** with the pinned dependencies:
 
 ```bash
 python -m pip install -r requirements.txt
-python reproducibility/tmp/audit_primary_comparison.py
+python tools/replay_primary.py
 ```
 
 After the yeast inputs are restored, the audit checks input and implementation hashes, all 360 panel constraints and evaluation scores, 180 paired statistics, nine summary groups, and six clock-controlled boundary tests. It writes `reproducibility/output/research/primary_comparison_audit_2026-10-25.json`. Run it in a disposable copy if you need the original archive tree to remain byte-for-byte unchanged. The audit replays **sealed outputs**; it does not regenerate timed search trajectories.
@@ -66,6 +66,7 @@ The follow-up comparison uses the same 20 yeast splits and 20 human search seeds
 With Python 3.11.7 and the versions in `requirements_independent_sa.txt` installed, replay the published sealed panels after restoring the yeast inputs:
 
 ```bash
+python tools/prepare_legacy_layout.py
 python src/independent_sa_benchmark.py score
 python tools/summarize_independent_sa.py
 python src/coverage_sensitivity_benchmark.py score

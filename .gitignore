@@ -6,5 +6,6 @@ __pycache__/
 *.pending
 /data/inputs/YDIP/interactions.txt
 /data/inputs/YBIOGRID/interactions.txt
-/reproducibility/tmp/ppi_data_audit/YDIP/interactions.txt
-/reproducibility/tmp/ppi_data_audit/YBIOGRID/interactions.txt
+/reproducibility/primary_archive/ppi_data_audit/YDIP/interactions.txt
+/reproducibility/primary_archive/ppi_data_audit/YBIOGRID/interactions.txt
+/reproducibility/tmp/

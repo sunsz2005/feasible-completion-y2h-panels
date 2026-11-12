@@ -18,7 +18,7 @@ def digest(data):
 
 
 def restore(name, expected):
-    archive = ROOT / "reproducibility/tmp/ppi_data_audit" / name / "interactions.txt"
+    archive = ROOT / "reproducibility/primary_archive/ppi_data_audit" / name / "interactions.txt"
     browsable = ROOT / "data/inputs" / name / "interactions.txt"
     for path in (archive, browsable):
         if path.exists() and digest(path.read_bytes()) != expected:

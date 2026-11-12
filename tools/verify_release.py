@@ -8,7 +8,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 ARCHIVE = ROOT / "reproducibility"
-SCORES = ARCHIVE / "tmp/ppi_data_audit/balanced_assay_initialization_time_20261024/scores.json"
+ORIGINAL = ARCHIVE / "primary_archive"
+SCORES = ORIGINAL / "ppi_data_audit/balanced_assay_initialization_time_20261024/scores.json"
 EXPORTS = {
     "summary": ROOT / "data/primary_summary.csv",
     "paired": ROOT / "data/primary_paired.csv",
@@ -22,7 +23,7 @@ def main():
     manifest = json.loads((ARCHIVE / "manifest_sha256.json").read_text(encoding="utf-8"))
     missing_excluded = set()
     for name, expected in manifest.items():
-        path = ARCHIVE / name
+        path = ORIGINAL / name.removeprefix("tmp/") if name.startswith("tmp/") else ARCHIVE / name
         if name in EXCLUDED_ARCHIVE and not path.exists():
             missing_excluded.add(name)
             continue
@@ -38,9 +39,9 @@ def main():
         "balanced_assay_tradeoff.py",
     )
     for name in code_names:
-        assert (ROOT / "src" / name).read_bytes() == (ARCHIVE / "tmp" / name).read_bytes(), name
+        assert (ROOT / "src" / name).read_bytes() == (ORIGINAL / name).read_bytes(), name
     for name in ("audit_primary_comparison.py", "test_balanced_assay_initialization_time.py"):
-        assert (ROOT / "tests" / name).read_bytes() == (ARCHIVE / "tmp" / name).read_bytes(), name
+        assert (ROOT / "tests" / name).read_bytes() == (ORIGINAL / name).read_bytes(), name
     inputs = (
         "HuRI.tsv", "YBIOGRID/interactions.txt", "YDIP/interactions.txt",
         "YeRI_supplementary_data_15.xlsx",
@@ -53,7 +54,7 @@ def main():
         if name in EXCLUDED_INPUTS and "tmp/ppi_data_audit/" + name in missing_excluded:
             assert not (ROOT / "data/inputs" / name).exists(), f"Unpaired excluded input: {name}"
             continue
-        assert (ROOT / "data/inputs" / name).read_bytes() == (ARCHIVE / "tmp/ppi_data_audit" / name).read_bytes(), name
+        assert (ROOT / "data/inputs" / name).read_bytes() == (ORIGINAL / "ppi_data_audit" / name).read_bytes(), name
     for name in ("scores.json", "sealed_panels.json"):
         assert (ROOT / "results/primary" / name).read_bytes() == (SCORES.parent / name).read_bytes(), name
     assert (ROOT / "requirements.txt").read_bytes() == (ARCHIVE / "requirements.txt").read_bytes()
