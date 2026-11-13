@@ -9,3 +9,8 @@ __pycache__/
 /reproducibility/primary_archive/ppi_data_audit/YDIP/interactions.txt
 /reproducibility/primary_archive/ppi_data_audit/YBIOGRID/interactions.txt
 /reproducibility/tmp/
+
+/reproducibility/output/
+/reruns/
+/reproducibility/flybi_validation/reruns/
+/reproducibility/flybi_validation/raw/clone_list_20230307.tsv

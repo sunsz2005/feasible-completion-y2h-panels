@@ -1,95 +1,92 @@
-# Feasible completion sets for dual-role screening panels
+# Feasible Completion Y2H Panels
 
-Code, input snapshots, sealed panels, and results for **Feasible completion-set construction for coverage-constrained yeast two-hybrid panel optimization** by Feng Sun and Haiye Liang. This directory accompanies a submission to *Algorithms for Molecular Biology*.
+Code and recorded results for **Feasible completion-set construction for coverage-constrained yeast two-hybrid panel optimization** by Feng Sun and Haiye Liang.
+
+The main comparison is completion-set initialization (B) versus coverage-first initialization (A), followed by the same feasible joint solver under the same total time allowance. The effect includes each initial panel's use as a restart anchor. The repository also contains the manuscript's matched controls, role-order ablations, coverage sensitivity and FlyBi validation. All reported A/B runs are retained, including negative differences and timing fallbacks.
 
 ## Contents
 
-| Path | Contents |
+| Directory | Manuscript content |
 | --- | --- |
-| `src/` | Seven original research scripts plus the later independent SA and coverage-sensitivity benchmark scripts. |
-| `tests/` | Original score-replay audit and timing-boundary tests. |
-| `data/inputs/` | Six included input and derived-mapping files. Two yeast network snapshots are obtained separately. |
-| `data/primary_summary.csv` | Nine source-by-budget summary rows. |
-| `data/primary_paired.csv` | 180 paired evaluation comparisons. |
-| `data/primary_runs.csv` | All 360 individual optimization paths. |
-| `results/primary/` | Original score and sealed-panel indexes. |
-| `results/independent_sa/` | Follow-up simulated-annealing protocol, sealed panels, scores, and paired summaries. |
-| `results/coverage_sensitivity/` | Coverage-threshold protocol, sealed panels, scores, probes, and paired summaries. |
-| `reproducibility/primary_archive/` | Original scripts, protocols, calibrations, panels, locks, and results, displayed under a descriptive directory name; two yeast network snapshots are excluded from Git. |
-| `reproducibility/manifest_sha256.json` | Unchanged historical SHA-256 manifest for all 479 original research files, including the two excluded inputs. |
-| `tools/verify_release.py` | Standard-library check of the included archive, browsable copies, and CSV exports. |
-| `tools/restore_yeast_inputs.py` | Fetch and hash-check the two excluded yeast network snapshots from their upstream repository. |
-| `DATA_SOURCES.md` | Sources, attribution, and data-use notes. |
+| `src/` | Seven original algorithm modules; A/B sensitivity workflow and shared input helpers. |
+| `results/primary/` | Primary score and sealed-panel indexes: 360 paths and 180 pairs. |
+| `results/coverage_sensitivity/` | All 360 A/B paths, paired summaries, coverage-neighborhood measurements and provenance. The 120 reused paths at tau=0.98 are in `reference_batch/`. |
+| `data/` | Primary CSV exports and reusable input snapshots; source attribution in `DATA_SOURCES.md`. |
+| `reproducibility/primary_archive/` | Original protocols, code, locks, inputs and run records supporting the primary experiment and supplementary controls. Retained file bytes and original hash labels are preserved; two historical locks are omitted as described below. |
+| `reproducibility/flybi_validation/` | A/B-only protocol extract, 20 splits, 40 panel records, calibration records, original hash subset, score replay and fresh-rerun entry point. |
+| `tools/` | Input restoration, integrity verification, result replay, summary and neighborhood-probe commands. |
+| `tests/` | Original score-audit and timing-boundary checks. |
 
-The files in `src/`, `tests/`, `data/inputs/`, and `results/primary/` are browsable copies of the original execution snapshot. The historical layout lives in `reproducibility/`; restore the two excluded yeast inputs before running the full score audit. The original experiment files are displayed under `reproducibility/primary_archive/`; their bytes and historical manifest hashes are preserved. The original locks and follow-up scripts refer to the former `tmp/` path, so `tools/prepare_legacy_layout.py` creates an ignored local compatibility copy when score replay is requested. Included archived files are unchanged from the audit archive. Original lock files contain historical Windows paths that the audit script resolves relative to this checkout. The verifier checks the included files against the manifest and their browsable copies. The CSV files are convenient exports of the original `scores.json`; the JSON is authoritative.
+Original primary audit reports are preserved under `reproducibility/primary_audits/`.
 
-The later independent-SA benchmark is in `src/independent_sa_benchmark.py` and `results/independent_sa/`. It adds a separate experiment without changing the seven original scripts or the archived primary results. Its A and B paths are rerun beside the independent SA path in one software environment; they should not be substituted for the original primary summaries. The benchmark's protocol, code and input hashes, panel files, seal, scores, and paired summaries permit a separate audit.
+`reproducibility/output/` and `reruns/` are generated locally and ignored by Git. They are not part of the distributed results. The primary replay helper creates an ignored compatibility directory for paths embedded in the original locks; the published archive itself is named `primary_archive/`.
 
-The authors' original software code is offered under the [MIT License](LICENSE). Third-party input datasets are excluded from that license and retain their source terms; see [DATA_SOURCES.md](DATA_SOURCES.md).
+## Check the download
 
-## Verify the package
-
-From this directory, run:
+From the repository root, run:
 
 ```bash
 python tools/verify_release.py
 ```
 
-This requires only the Python standard library and checks 477 included archived files, their browsable copies, CSV exports, panel count, and primary result counts. The two excluded yeast inputs remain listed in the manifest and are checked if present. This step does not rerun the time-limited optimization.
+This standard-library check verifies the current distribution manifest, retained primary hashes, original sensitivity panel hashes, FlyBi hash subset, and primary CSV exports. It does not run optimization. `distribution_manifest.json` identifies this packaging version; it is not a pre-experiment seal.
 
-## Restore the two excluded yeast inputs
+## Primary results and supplementary controls
 
-The YDIP and YBIOGRID `interactions.txt` snapshots came from the [CM-PIN upstream repository](https://github.com/paopaopig/The-construction-of-the-CM-PIN./tree/main/datasets/yeast). That repository does not state redistribution terms for these files, so they are not committed here. For a full score replay, run:
-
-```bash
-python tools/restore_yeast_inputs.py
-python tools/verify_release.py
-```
-
-The restoration script downloads each file from that upstream repository, checks its SHA-256 against the historical manifest, and places verified copies in both `data/inputs/` and `reproducibility/primary_archive/ppi_data_audit/`. It accepts the upstream file's original or normalized line endings only when the historical hash matches. If the upstream files change, the script stops without substituting different data. The original YDIP and YBIOGRID SHA-256 values are `ded6cc2c13a63c08c91bead1e1d213dd689b3faf3f3bf81832c8624812700219` and `64897f90c458dd2b7ceadf922d3313c688fef91fc1a8ae588c8b8a3338be4370`, respectively.
-
-## Replay sealed-panel scoring
-
-Use **Python 3.12.14** with the pinned dependencies:
+Use **Python 3.12.14** with the original dependencies:
 
 ```bash
 python -m pip install -r requirements.txt
+python tools/restore_yeast_inputs.py
 python tools/replay_primary.py
 ```
 
-After the yeast inputs are restored, the audit checks input and implementation hashes, all 360 panel constraints and evaluation scores, 180 paired statistics, nine summary groups, and six clock-controlled boundary tests. It writes `reproducibility/output/research/primary_comparison_audit_2026-10-25.json`. Run it in a disposable copy if you need the original archive tree to remain byte-for-byte unchanged. The audit replays **sealed outputs**; it does not regenerate timed search trajectories.
+The two excluded yeast snapshots are retrieved from the original source and checked against their recorded hashes. The audit verifies 360 panels, input/split identities, 180 paired statistics, nine summary groups, timing arithmetic and six controlled-clock boundary tests. The original computation used an Intel Core i7-6700 at 3.40 GHz, Windows 10 Home China 22H2, NumPy 2.3.5 and OpenPyXL 3.1.5. No explicit native-library thread limit was set for these primary runs.
 
-## Independent simulated-annealing comparison
+Two historical `lock.json` files (the primary initialization-time and human external stages) are omitted from this distribution. Their original bytes remain in the separate local research archive. `results/primary/replay_metadata.json` preserves their original digests, the primary configuration and software versions, and retained dependency hashes using relative paths. This is post-scoring metadata, not a replacement pre-run lock. Use `tools/replay_primary.py` for the current package; direct execution of the archived historical audit requires the original locks. The current verifier reports the two omissions explicitly. For a portability check in a different software environment, add `--allow-version-difference`; its report states whether versions match.
 
-The follow-up comparison uses the same 20 yeast splits and 20 human search seeds at the archived primary `5*T0` budget. It compares complete A and B pipelines with a separate constrained simulated-annealing joint optimizer, rerunning all three serially on the same computer and software environment. Initialization time is included for each path. Evaluation interactions are parsed and scored only after all 180 panel outputs are sealed. See `results/independent_sa/protocol.md` for the fixed move, cooling, coverage, and timing rules. The two yeast input snapshots must be restored locally before regeneration; they remain excluded from Git.
+The primary archive also retains the development, coverage-timing, role-order, fixed-time and EP-Prox-inspired controls described in Supplementary Sections S1-S7. Their locks form part of the primary audit's dependency chain. They are retained even where a control did not favor the proposed constructor.
 
-With Python 3.11.7 and the versions in `requirements_independent_sa.txt` installed, replay the published sealed panels after restoring the yeast inputs:
+## Coverage sensitivity
+
+Use a separate **Python 3.11.7** environment:
 
 ```bash
-python tools/prepare_legacy_layout.py
-python src/independent_sa_benchmark.py score
-python tools/summarize_independent_sa.py
+python -m pip install -r requirements_followup.txt
+python tools/restore_yeast_inputs.py
 python src/coverage_sensitivity_benchmark.py score
-python tools/summarize_coverage_sensitivity.py
+python tools/summarize_coverage_sensitivity.py --scores reproducibility/output/coverage_sensitivity/scores.json
+python tools/probe_output_neighborhood.py
 ```
 
-The published checkout already contains both locks, seals, and all panel files. The `lock` command refuses an existing lock, and `generate` refuses an existing seal. For an independent timed rerun, use a disposable copy: remove the generated `lock.json`, `seal.json`, and `panel_*.json` files from both follow-up result directories while retaining their protocols; then run SA `lock`, `generate`, and `score`, followed by sensitivity `lock`, `generate`, and `score`. Recreate summaries after scoring. Wall-clock trajectories may differ, so a timed rerun is not expected to reproduce the archived panel bytes.
+The wrappers set `OMP_NUM_THREADS`, `OPENBLAS_NUM_THREADS` and `MKL_NUM_THREADS` to 1. Original generation used NumPy 1.26.4 and OpenPyXL 3.0.10 on Windows 10 build 19045 with the same Intel Core i7-6700 (four physical cores, eight logical processors). Replay outputs go to `reproducibility/output/coverage_sensitivity/`; archived scores and panels are not overwritten. The probe is post hoc and descriptive, and does not establish a causal effect of neighborhood size.
 
-The lock records a SHA-256 digest of the evaluation file before generation to identify the input version. The generation algorithm does not parse evaluation-edge records or use their scores; parsing and scoring occur after the panel seal.
+The 0.90/0.95 paths and the reused 0.98 paths came from two separately sealed batches. `provenance.json` preserves all 360 original panel hashes, recorded environment, original seal/lock digests and retained input/solver hashes. It and `protocol_extract.md` were assembled after scoring. They do not claim to be the original pre-run documents; the complete historical records remain in a separate local archive. The extracted shared input helper removes dependencies on experiments outside this manuscript without changing the original algorithm modules or recorded results.
 
-For the descriptive training-versus-evaluation comparison, install `requirements_train_eval_plot.txt` and run `python tools/plot_train_eval_deltas.py`. It reads the sealed `paired.csv` and writes `train_eval_correlation.json` and `train_eval_deltas.pdf` in the same results directory. The 20 human points reuse one graph pair, so the reported Spearman coefficients describe search-run variation rather than independent biological samples.
+For a new timed **0.90/0.95** batch, choose a new directory:
 
-The separate coverage-threshold follow-up is in `src/coverage_sensitivity_benchmark.py` and `results/coverage_sensitivity/`. It fixes `q=0.8`, `k=200`, and the same `5*T0` total budget while testing `tau=0.90, 0.95, 0.98`. The 0.98 A/B paths come from the sealed independent-SA rerun. The commands above replay its archived scores and summary. The protocol explains the fixed-panel feasible-replacement probe and why its results are descriptive.
+```bash
+python src/coverage_sensitivity_benchmark.py lock --output reruns/sensitivity
+python src/coverage_sensitivity_benchmark.py generate --output reruns/sensitivity
+python src/coverage_sensitivity_benchmark.py score --output reruns/sensitivity
+python tools/summarize_coverage_sensitivity.py --scores reruns/sensitivity/replay/scores.json
+```
 
-Here `q=0.8` is the coverage-model parameter in the manuscript's coverage equation. The yeast training/evaluation edge split is separately 80:20. The locked sensitivity protocol uses the phrase "training fraction" for `q`; that phrase is a terminology error, and the protocol is preserved unchanged to retain its recorded SHA-256 lock.
+As in the original design, this command reuses the archived 0.98 A/B batch. It does not present all three thresholds as newly generated. Time allowances use the archived per-instance calibration; wall-clock trajectories can change with hardware and load. New-run locks record the actual rerun environment. No evaluation edges are used to select optimization states.
 
-For a more informative post hoc check of the final panels' local neighborhoods, run `python tools/probe_output_neighborhood.py` after scoring. It writes `output_neighborhood.json`; `results/coverage_sensitivity/output_neighborhood_protocol.md` defines the sampled move and its limitations.
+## FlyBi validation
 
-## Reproduction scope
+Use the same Python 3.11.7 follow-up environment:
 
-The original comparison used 20 yeast split/search seeds for each of YDIP and YBIOGRID, and 20 search seeds on one historical human graph pair. Budgets were calibrated per training instance at `T0`, `5T0`, and `20T0`. Evaluation edges were counted only after outputs had been selected by training scores and sealed. The run environment was an Intel Core i7-6700 CPU at 3.40 GHz with eight logical processors, Windows 10 Home China 22H2, Python 3.12.14, NumPy 2.3.5, and openpyxl 3.1.5. Optimization paths ran sequentially. No OpenMP, OpenBLAS, or MKL thread limit was set; NumPy's effective native thread count was not logged. Wall-clock trajectories can vary on other machines.
+```bash
+python reproducibility/flybi_validation/replay_ab.py
+python reproducibility/flybi_validation/rerun_ab.py --seed 20261113
+```
 
-## Before public release
+The first command verifies and rescores the 40 archived panels without timed optimization. The second generates a fresh timed A/B pair with the three native-library thread limits set to 1 before NumPy is imported. It writes to that directory's ignored `reruns/` folder. Timing outputs need not match the archive byte for byte.
 
-The public repository is <https://github.com/sunsz2005/feasible-completion-y2h-panels>. The two yeast snapshots remain excluded pending redistribution permission. A release DOI has not yet been assigned; update the manuscript's availability statement with the repository URL and, when available, the release DOI.
+The protocol extract and seal subset were packaged after scoring; their hash entries refer to the original pre-evaluation seal. Shared role eligibility is a computational assumption. The raw clone-list TSV is excluded from this Git tree; its URL and exact hash are in `data_audit.json`. If needed for the input audit, retrieve it with `python tools/restore_flybi_inputs.py`. The fixed candidate identifiers and splits suffice for replay.
 
+## Citation and licensing
+
+See `CITATION.cff` for the manuscript authors and title. Original project code is under the MIT license. Third-party data retain their source terms; the MIT license does not apply to those datasets. Cite the original publications and data providers in `DATA_SOURCES.md` when reusing inputs. The excluded YDIP/YBIOGRID snapshots must not be included in a public upload without redistribution permission.

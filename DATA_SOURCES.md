@@ -16,3 +16,9 @@ For yeast, the processed candidate-restricted graphs contain 8,294 YDIP and 25,1
 
 The project-generated panels, calibrations, and scores are in `reproducibility/primary_archive/ppi_data_audit/balanced_assay_initialization_time_20261024/`. The main score and panel indexes are also copied to `results/primary/`. The CSV exports in `data/` contain the same recorded results in table form. The upstream snapshots and derived outputs have different provenance and are not assigned one blanket license.
 
+
+## FlyBi independent-network validation
+
+Tang HW, Spirohn K, Hu Y, et al. (2023), Nature Communications 14:2162, https://doi.org/10.1038/s41467-023-37876-0 . Published Supplementary Data 5 supplies interaction pairs under CC BY 4.0. Candidate identifiers come from the official FlyBi clone table dated 7 March 2023, https://flybi.hms.harvard.edu/clones.php . We acknowledge BDGP, CCSB and DRSC. The raw clone table is not redistributed in Git; download details and exact hashes are recorded in `reproducibility/flybi_validation/data_audit.json`. Candidate-list membership is not proof of dual-role assay eligibility. The published-source data and model-derived records are distinct from the MIT-licensed software.
+
+The sensitivity results use all 360 A/B paths reported in the manuscript. The 120 reused paths are in `results/coverage_sensitivity/reference_batch/`; `provenance.json` preserves their original hashes and identifies both original run batches. This provenance extract was assembled after scoring and does not replace the historical pre-run locks. The original complete records are retained outside this upload tree.

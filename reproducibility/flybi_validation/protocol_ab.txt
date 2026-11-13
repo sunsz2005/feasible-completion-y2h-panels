@@ -1,0 +1,9 @@
+FlyBi A/B computational transfer protocol
+
+Candidate universe: 9,620 unique identifiers from the official clone list dated 7 March 2023, fixed before using interaction endpoints. Restrict the published FlyBi supplementary data 5 to this universe, remove self-loops, and collapse undirected duplicate pairs. Keep isolated vertices.
+
+For seeds 20261113 to 20261132, permute the sorted 8,342-edge list with NumPy default_rng(seed). Put the first 6,673 edges into training and the remaining 1,669 into evaluation. Use the same split and search seed for A and B. Do not load evaluation partitions during optimization.
+
+Use panel size 200, balanced exclusive roles of 100 each, coverage parameter q=0.8, threshold 0.98 times the training reference coverage, and the unchanged A/B construction and common joint solver. Calibrate T0 once per training split by reference coverage selection, fixed-panel role partition, reference coverage calculation, and completion-set construction. Charge each A/B path for its own initialization and give it 5*T0 total wall time. Graph preparation, calibration, verification, and file writing are outside the timed path. Execute paths serially. Retain all completed paths. The timing tolerance is max(0.02 seconds, 5% of the allowance).
+
+This document extracts the A/B protocol from the original pre-run research record. It was packaged after scoring; the original protocol and full input/implementation lock remain in the local research record. No settings were selected using this network's evaluation scores.

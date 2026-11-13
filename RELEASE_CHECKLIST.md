@@ -1,12 +1,10 @@
-# Public-release checklist
+# Release checks
 
-The Git package is complete for checking recorded results. Before a full score replay or a versioned release:
+1. Run `python tools/verify_release.py` in the download copy.
+2. In the documented environments, replay primary results, coverage sensitivity and FlyBi A/B results. Keep locally restored inputs, compatibility copies and rerun outputs out of Git.
+3. Preserve all reported A/B results, timing fallbacks and supplementary controls. Original panel hashes must not be regenerated to mask a change.
+4. The sensitivity and FlyBi protocol extracts and hash subsets were packaged after scoring. Preserve this distinction when describing them.
+5. At the final public update, record the new commit/release identifier and align the manuscript's repository citation with that version. The current local restructuring does not change the existing public commit.
+6. Check source attribution and exclusions in `DATA_SOURCES.md`. MIT covers the project code, not the upstream datasets.
 
-1. The authors' original code has an MIT license. Confirm that any reused third-party code, if identified later, is excluded or separately credited; the MIT license does not apply to upstream datasets.
-2. The YDIP and YBIOGRID snapshots are excluded from Git. Restore and hash-check them using `python tools/restore_yeast_inputs.py` before the full score replay. Do not add them to the public repository unless redistribution terms are confirmed.
-3. Create a stable release and archive that release in a service that assigns a persistent DOI, if available.
-4. Keep the manuscript's **Availability of data and materials** statement aligned with the public repository commit that contains both the original archive and the follow-up independent-SA benchmark. Add a release DOI if one becomes available.
-5. Verify the uploaded tree using `python tools/verify_release.py`. For the full score replay, use Python 3.12.14 and the pinned dependencies described in `README.md`.
-
-The archived lock files include historical absolute Windows workspace paths. These are provenance records, not paths a reader must recreate; the audit script rebases them. The data are interaction records and candidate identifiers, not participant-level clinical data. This checklist does not replace the journal's own submission declarations.
-
+Two historical lock files are omitted. The primary replay reports this explicitly and uses the relative-path metadata in `results/primary/replay_metadata.json`. Retained hashes and panel records must still pass validation.

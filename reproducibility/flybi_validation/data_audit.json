@@ -1,0 +1,23 @@
+{
+  "created_utc": "2026-11-13T02:32:14.314288+00:00",
+  "clone_rows": 10533,
+  "candidate_genes": 9620,
+  "input_pair_rows": 8723,
+  "outside_candidate_rows": 227,
+  "within_universe_self_loop_rows": 154,
+  "duplicate_rows": 0,
+  "retained_undirected_edges": 8342,
+  "isolated_in_full_retained_graph": 6789,
+  "train_edges_per_split": 6673,
+  "evaluation_edges_per_split": 1669,
+  "sources": {
+    "raw/FlyBi_supplementary_data_5.xlsx": "https://static-content.springer.com/esm/art%3A10.1038%2Fs41467-023-37876-0/MediaObjects/41467_2023_37876_MOESM8_ESM.xlsx",
+    "raw/clone_list_20230307.tsv": "https://flybi.hms.harvard.edu/data/clone_list_FlyBi_Web_20230307.tsv"
+  },
+  "raw_sha256": {
+    "raw\\clone_list_20230307.tsv": "85ab706b28f745e2b8d7f7767da5be4d3b7c89ea2820b5baa4329fa223865d39",
+    "raw\\FlyBi_source_data.xlsx": "270590b13cd6acc37d77d0681a2fc1419ca3343c9da64459eb6a59dd5cd6e86a",
+    "raw\\FlyBi_supplement.pdf": "1e93751b14c59f973e0922c225c6af67893b36c7a7a67b42934ab5c97b18115c",
+    "raw\\FlyBi_supplementary_data_5.xlsx": "03ee17d47bfb83ccd5206adfd3605f1dd54596736dbb483b2944b797a043c0f1"
+  }
+}

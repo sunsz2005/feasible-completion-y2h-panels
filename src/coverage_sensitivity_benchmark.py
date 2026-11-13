@@ -1,9 +1,4 @@
-"""Matched-budget coverage-threshold sensitivity for pipelines A and B.
-
-The 0.98 arm is reused from the separately sealed independent-SA rerun, whose
-software, machine, seeds, budget, and A/B implementation match this follow-up.
-This script generates and seals the 0.90 and 0.95 arms before evaluation scoring.
-"""
+"""Replay sealed A/B sensitivity results or generate a new two-threshold batch."""
 
 import json
 import os
@@ -17,11 +12,13 @@ import numpy as np
 
 import balanced_assay_initialization_time as frozen
 import balanced_assay_external as external
-import independent_sa_benchmark as earlier
+import coverage_sensitivity_inputs as shared
 
 
 REPO = Path(__file__).resolve().parents[1]
-OUTPUT = REPO / "results" / "coverage_sensitivity"
+ARCHIVED = REPO / "results" / "coverage_sensitivity"
+OUTPUT = ARCHIVED
+REPORT = REPO / "reproducibility" / "output" / "coverage_sensitivity"
 GUARDS_NEW = (0.90, 0.95)
 GUARDS_ALL = (0.90, 0.95, 0.98)
 METHODS = ("A", "B")
@@ -38,31 +35,34 @@ def panel_name(source, seed, guard, method):
 
 def expected_names():
     return [panel_name(source, seed, guard, method)
-            for source in earlier.SOURCES for seed in earlier.SEEDS
+            for source in shared.SOURCES for seed in shared.SEEDS
             for guard in GUARDS_NEW for method in METHODS]
 
 
 def lock(create=False):
-    earlier.lock()
-    files = [Path(__file__), OUTPUT / "protocol.md", REPO / "src" / "independent_sa_benchmark.py"]
-    value = {
-        "config": {
-            "sources": earlier.SOURCES, "seeds": earlier.SEEDS,
-            "guards_new": GUARDS_NEW, "guards_reused": (0.98,),
-            "methods": METHODS, "q": 0.8, "k": 200,
-            "multiplier": earlier.MULTIPLIER, "probe_pairs": PROBE_PAIRS,
-        },
-        "environment": earlier.environment(),
-        "files_sha256": {str(path.relative_to(REPO)): earlier.sha(path) for path in files},
-        "prior_seal_sha256": earlier.sha(earlier.OUTPUT / "seal.json"),
-    }
+    shared.lock()
+    if OUTPUT == ARCHIVED:
+        assert not create, "Original archived results cannot be relocked"
+        return shared.provenance()
     path = OUTPUT / "lock.json"
+    value = {
+        "purpose": "New timed A/B sensitivity rerun, not the original experiment",
+        "config": shared.provenance()["config"],
+        "environment": shared.environment(),
+        "files_sha256": {p.name:shared.sha(p) for p in sorted((REPO/"src").glob("*.py"))},
+        "original_provenance_sha256": shared.sha(ARCHIVED / "provenance.json"),
+    }
     if create:
-        assert not path.exists(), "Lock already exists"
-        earlier.write_json(path, value)
+        assert not path.exists(), "New lock already exists"
+        shared.write_json(path, value)
     else:
-        assert json.loads(path.read_text(encoding="utf-8")) == json.loads(json.dumps(value)), "Protocol or environment changed"
+        assert json.loads(path.read_text(encoding="utf-8")) == value, "New run configuration changed"
     return value
+
+
+def seal_hashes():
+    originals = shared.provenance()["original_seals"]
+    return (originals["new"] if OUTPUT == ARCHIVED else shared.sha(OUTPUT / "seal.json"), originals["reference"])
 
 
 def method_order(source_index, seed_index, guard_index):
@@ -70,15 +70,16 @@ def method_order(source_index, seed_index, guard_index):
 
 
 def generate():
+    assert OUTPUT != ARCHIVED, "Use --output for a fresh timed run"
     lock()
     assert not (OUTPUT / "seal.json").exists(), "Outputs already sealed"
-    yeast_names, yeast_edges = earlier.yeast_inputs()
+    yeast_names, yeast_edges = shared.yeast_inputs()
     done = sum((OUTPUT / name).exists() for name in expected_names())
-    for seed_index, seed in enumerate(earlier.SEEDS):
-        for source_index, source in enumerate(earlier.SOURCES):
-            key, names, train, cal = earlier.instance(source, seed, yeast_names, yeast_edges)
-            a = earlier.pilot.matrix(len(names), train)
-            budget = earlier.MULTIPLIER * cal["t0_seconds"]
+    for seed_index, seed in enumerate(shared.SEEDS):
+        for source_index, source in enumerate(shared.SOURCES):
+            key, names, train, cal = shared.instance(source, seed, yeast_names, yeast_edges)
+            a = shared.pilot.matrix(len(names), train)
+            budget = shared.MULTIPLIER * cal["t0_seconds"]
             for guard_index, guard in enumerate(GUARDS_NEW):
                 floor = guard * cal["reference_coverage"]
                 for method in method_order(source_index, seed_index, guard_index):
@@ -88,8 +89,8 @@ def generate():
                         continue
                     print(f"START {done+1}/240 {source} {seed} tau={tag(guard)} {method}", flush=True)
                     state, timing = frozen.pipeline(a, method, floor, budget, seed)
-                    db, ad, coverage = earlier.validate_panel(state, floor)
-                    earlier.write_json(path, {
+                    db, ad, coverage = shared.validate_panel(state, floor)
+                    shared.write_json(path, {
                         "source": source, "seed": seed, "method": method,
                         "tau": guard, "instance": key, "train_sha256": cal["train_sha256"],
                         "reference_coverage": cal["reference_coverage"],
@@ -99,32 +100,31 @@ def generate():
                     done += 1
                     print(f"DONE {done}/240 valid={timing['timing_valid']} train={state.score}", flush=True)
     assert done == len(expected_names())
-    earlier.write_json(OUTPUT / "seal.json", {
-        "lock_sha256": earlier.sha(OUTPUT / "lock.json"),
+    shared.write_json(OUTPUT / "seal.json", {
+        "lock_sha256": shared.sha(OUTPUT / "lock.json"),
         "panels": done,
-        "files_sha256": {name: earlier.sha(OUTPUT / name) for name in expected_names()},
+        "files_sha256": {name: shared.sha(OUTPUT / name) for name in expected_names()},
     })
     print("SEALED: 240 panels; evaluation edges not yet read", flush=True)
 
 
 def verify_seals():
-    seal = json.loads((OUTPUT / "seal.json").read_text(encoding="utf-8"))
-    assert seal["lock_sha256"] == earlier.sha(OUTPUT / "lock.json")
-    assert set(seal["files_sha256"]) == set(expected_names())
-    assert all(earlier.sha(OUTPUT / name) == sha for name, sha in seal["files_sha256"].items())
-    prior = json.loads((earlier.OUTPUT / "seal.json").read_text(encoding="utf-8"))
-    assert prior["lock_sha256"] == earlier.sha(earlier.OUTPUT / "lock.json")
-    for seed in earlier.SEEDS:
-        for source in earlier.SOURCES:
-            for method in METHODS:
-                name = f"panel_{source}_{seed}_{method}.json"
-                assert earlier.sha(earlier.OUTPUT / name) == prior["files_sha256"][name]
+    hashes = shared.provenance()["original_panel_hashes"]
+    assert len(hashes) == 360
+    for rel, digest in hashes.items():
+        assert shared.sha(ARCHIVED / rel) == digest, rel
+    if OUTPUT != ARCHIVED:
+        seal = json.loads((OUTPUT / "seal.json").read_text(encoding="utf-8"))
+        assert seal["lock_sha256"] == shared.sha(OUTPUT / "lock.json")
+        assert set(seal["files_sha256"]) == set(expected_names())
+        for rel, digest in seal["files_sha256"].items():
+            assert shared.sha(OUTPUT / rel) == digest, rel
 
 
 def sample_replacement_feasibility(a, reference, seed, source):
     selected = np.flatnonzero(reference.roles)
     outside = np.flatnonzero(reference.roles == 0)
-    rng = np.random.default_rng(seed + 1000000 + earlier.SOURCES.index(source))
+    rng = np.random.default_rng(seed + 1000000 + shared.SOURCES.index(source))
     pairs = [(int(selected[rng.integers(len(selected))]), int(outside[rng.integers(len(outside))]))
              for _ in range(PROBE_PAIRS)]
     reference_coverage = reference.coverage()
@@ -141,37 +141,37 @@ def sample_replacement_feasibility(a, reference, seed, source):
 def score():
     lock()
     verify_seals()
-    yeast_names, yeast_edges = earlier.yeast_inputs()
+    yeast_names, yeast_edges = shared.yeast_inputs()
     outcomes = external.novel(
         external.edges(external.INPUTS["outcome"]),
         [external.edges(external.INPUTS[key]) for key in external.CONFIG["exclusion"]],
     )
     rows = []
     probes = []
-    for seed in earlier.SEEDS:
-        for source in earlier.SOURCES:
-            key, names, train, cal = earlier.instance(source, seed, yeast_names, yeast_edges)
+    for seed in shared.SEEDS:
+        for source in shared.SOURCES:
+            key, names, train, cal = shared.instance(source, seed, yeast_names, yeast_edges)
             if source == "SpaceI":
                 test = external.restricted(outcomes, names)
             else:
                 edges = yeast_edges[source]
                 order = np.random.default_rng(seed).permutation(len(edges))
                 test = edges[order[int(0.8 * len(edges)):]]
-            a = earlier.pilot.matrix(len(names), train)
-            selected = earlier.pilot.coverage_order(a, 200)
-            reference = earlier.pilot.partition(a, selected)
+            a = shared.pilot.matrix(len(names), train)
+            selected = shared.pilot.coverage_order(a, 200)
+            reference = shared.pilot.partition(a, selected)
             assert abs(reference.coverage() - cal["reference_coverage"]) < 1e-6
             probes.append({"source": source, "seed": seed,
                            "feasible_replacement_fraction": sample_replacement_feasibility(a, reference, seed, source)})
             for guard in GUARDS_ALL:
                 floor = guard * cal["reference_coverage"]
                 for method in METHODS:
-                    path = ((earlier.OUTPUT / f"panel_{source}_{seed}_{method}.json") if guard == 0.98
+                    path = ((shared.OUTPUT / f"panel_{source}_{seed}_{method}.json") if guard == 0.98
                             else (OUTPUT / panel_name(source, seed, guard, method)))
                     panel = json.loads(path.read_text(encoding="utf-8"))
-                    state = earlier.pilot.State(a, panel["db"], panel["ad"])
+                    state = shared.pilot.State(a, panel["db"], panel["ad"])
                     assert state.score == panel["train_cross"]
-                    _, _, coverage = earlier.validate_panel(state, floor)
+                    _, _, coverage = shared.validate_panel(state, floor)
                     assert abs(coverage - panel["coverage"]) < 1e-6
                     rows.append({
                         "source": source, "seed": seed, "tau": guard,
@@ -182,15 +182,24 @@ def score():
                         "allowed_seconds": panel["allowed_seconds"],
                         "timing_valid": panel["timing_valid"],
                     })
-    earlier.write_json(OUTPUT / "scores.json", {
+    shared.write_json(REPORT / "scores.json", {
         "rows": rows, "probes": probes,
-        "new_seal_sha256": earlier.sha(OUTPUT / "seal.json"),
-        "prior_seal_sha256": earlier.sha(earlier.OUTPUT / "seal.json"),
+        "new_seal_sha256": seal_hashes()[0],
+        "prior_seal_sha256": seal_hashes()[1],
     })
     print("SCORED", len(rows), "sealed panels", flush=True)
 
 
 if __name__ == "__main__":
-    if len(sys.argv) != 2 or sys.argv[1] not in ("lock", "generate", "score"):
-        raise SystemExit("Usage: python coverage_sensitivity_benchmark.py lock|generate|score")
-    {"lock": lambda: lock(True), "generate": generate, "score": score}[sys.argv[1]]()
+    import argparse
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("command", choices=("lock", "generate", "score"))
+    parser.add_argument("--output", type=Path, help="New timed-run directory; never the archived results")
+    args = parser.parse_args()
+    if args.output:
+        OUTPUT = args.output.resolve()
+        forbidden = [REPO/"src", REPO/"data", REPO/"results", REPO/"reproducibility"]
+        assert OUTPUT != REPO and not any(OUTPUT == p or p in OUTPUT.parents for p in forbidden), "Choose a new directory outside preserved inputs/results"
+        OUTPUT.mkdir(parents=True, exist_ok=True)
+        REPORT = OUTPUT / "replay"
+    {"lock": lambda: lock(True), "generate": generate, "score": score}[args.command]()

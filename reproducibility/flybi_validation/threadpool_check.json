@@ -1,0 +1,11 @@
+[
+  {
+    "filepath": "D:\\anaconda3\\Library\\bin\\mkl_rt.2.dll",
+    "prefix": "mkl_rt",
+    "user_api": "blas",
+    "internal_api": "mkl",
+    "version": "2023.1-Product",
+    "num_threads": 1,
+    "threading_layer": "intel"
+  }
+]

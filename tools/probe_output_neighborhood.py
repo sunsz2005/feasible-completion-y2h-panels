@@ -5,6 +5,9 @@ import statistics
 from collections import defaultdict
 from pathlib import Path
 
+import os
+for variable in ("OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS", "MKL_NUM_THREADS"):
+    os.environ[variable] = "1"
 import numpy as np
 
 import sys
@@ -12,7 +15,7 @@ import sys
 repo = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(repo / "src"))
 import coverage_sensitivity_benchmark as sensitivity
-import independent_sa_benchmark as earlier
+import coverage_sensitivity_inputs as shared
 
 
 SAMPLES = 1000
@@ -20,6 +23,7 @@ BLOCK = 64
 out = repo / "results" / "coverage_sensitivity"
 sensitivity.lock()
 sensitivity.verify_seals()
+sensitivity.REPORT.mkdir(parents=True, exist_ok=True)
 
 
 def feasible_fraction(state, floor, seed):
@@ -48,21 +52,21 @@ def feasible_fraction(state, floor, seed):
     return feasible / SAMPLES
 
 
-yeast_names, yeast_edges = earlier.yeast_inputs()
+yeast_names, yeast_edges = shared.yeast_inputs()
 records = []
-for source in earlier.SOURCES:
-    for seed in earlier.SEEDS:
-        key, names, train, cal = earlier.instance(source, seed, yeast_names, yeast_edges)
-        a = earlier.pilot.matrix(len(names), train)
+for source in shared.SOURCES:
+    for seed in shared.SEEDS:
+        key, names, train, cal = shared.instance(source, seed, yeast_names, yeast_edges)
+        a = shared.pilot.matrix(len(names), train)
         for guard in sensitivity.GUARDS_ALL:
             floor = guard * cal["reference_coverage"]
             for method in sensitivity.METHODS:
-                path = ((earlier.OUTPUT / f"panel_{source}_{seed}_{method}.json") if guard == 0.98
+                path = ((shared.OUTPUT / f"panel_{source}_{seed}_{method}.json") if guard == 0.98
                         else (out / sensitivity.panel_name(source, seed, guard, method)))
                 panel = json.loads(path.read_text(encoding="utf-8"))
-                state = earlier.pilot.State(a, panel["db"], panel["ad"])
-                earlier.validate_panel(state, floor)
-                fraction = feasible_fraction(state, floor, seed + 2000000 + earlier.SOURCES.index(source))
+                state = shared.pilot.State(a, panel["db"], panel["ad"])
+                shared.validate_panel(state, floor)
+                fraction = feasible_fraction(state, floor, seed + 2000000 + shared.SOURCES.index(source))
                 records.append({
                     "source": source, "seed": seed, "tau": guard, "method": method,
                     "feasible_replacement_fraction": fraction,
@@ -70,7 +74,7 @@ for source in earlier.SOURCES:
         print(f"PROBED {source} {seed}", flush=True)
 
 summary = defaultdict(dict)
-for source in earlier.SOURCES:
+for source in shared.SOURCES:
     for guard in sensitivity.GUARDS_ALL:
         tag = sensitivity.tag(guard)
         summary[source][tag] = {}
@@ -86,10 +90,10 @@ for source in earlier.SOURCES:
 payload = {
     "samples_per_panel": SAMPLES,
     "interpretation": "Post hoc fixed-output local replacement probe; output panels differ across thresholds and methods; not a timed search-space count",
-    "new_seal_sha256": earlier.sha(out / "seal.json"),
-    "prior_seal_sha256": earlier.sha(earlier.OUTPUT / "seal.json"),
+    "new_seal_sha256": sensitivity.seal_hashes()[0],
+    "prior_seal_sha256": sensitivity.seal_hashes()[1],
     "records": records,
     "summary": summary,
 }
-(out / "output_neighborhood.json").write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+(sensitivity.REPORT / "output_neighborhood.json").write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
 print(json.dumps(summary, indent=2))

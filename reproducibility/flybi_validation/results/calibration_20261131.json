@@ -1,0 +1,8 @@
+{
+  "seed": 20261131,
+  "created_utc": "2026-11-13T03:16:20.162889+00:00",
+  "t0_seconds": 10.022437000181526,
+  "floor": 1720.987602684855,
+  "reference_coverage": 1756.1097986580153,
+  "train_sha256": "7934aadd07faff6ce7a9ff58ec2662bb56a5c4db2901bda39ae094a934138cb2"
+}

@@ -9,7 +9,13 @@ from pathlib import Path
 
 repo = Path(__file__).resolve().parents[1]
 out = repo / "results" / "coverage_sensitivity"
-payload = json.loads((out / "scores.json").read_text(encoding="utf-8"))
+import argparse
+parser = argparse.ArgumentParser(description=__doc__)
+parser.add_argument("--scores", type=Path, default=out / "scores.json")
+args = parser.parse_args()
+payload = json.loads(args.scores.read_text(encoding="utf-8"))
+out = repo / "reproducibility" / "output" / "coverage_sensitivity"
+out.mkdir(parents=True, exist_ok=True)
 rows = payload["rows"]
 probes = payload["probes"]
 assert len(rows) == 360 and len(probes) == 60
